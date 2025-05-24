@@ -38,10 +38,13 @@ Zelda Targeting brings the beloved lock-on combat system from Nintendo's acclaim
 - **Audio Settings** - Customizable sound effects and volume
 - **Performance Options** - Optimize for your hardware
 
-### 🎵 **Audio Experience**
-- **Target Acquisition Sounds** - Audio cues when locking onto targets
-- **Customizable Volume** - Adjust or disable sounds completely
-- **Immersive Feedback** - Audio that enhances the combat experience
+### 🎵 **Enhanced Audio System**
+- **Target Lock Sounds** - Crisp audio feedback when acquiring targets
+- **Target Switch Audio** - Subtle sounds when cycling between enemies
+- **Lethal Target Alerts** - Dramatic audio cues for one-hit-kill opportunities
+- **Target Lost Feedback** - Audio notification when losing lock-on
+- **Individual Volume Controls** - Fine-tune each sound type separately
+- **Smart Audio Logic** - Context-aware sound selection for maximum immersion
 
 ---
 
@@ -82,11 +85,13 @@ Zelda Targeting brings the beloved lock-on combat system from Nintendo's acclaim
 - Target Neutral Mobs  
 - Target Passive Mobs
 
-### 🔊 **Audio & Performance**
-- Sound Effects Toggle
-- Volume Control
-- Update Frequency
-- Validation Intervals
+### 🔊 **Enhanced Audio & Performance**
+- Master Sound Effects Toggle
+- Individual Sound Type Controls (Lock, Switch, Lethal, Lost)
+- Separate Volume Sliders for Each Sound
+- Smart Audio Logic with Context Awareness
+- Update Frequency Optimization
+- Validation Interval Tuning
 
 ---
 
@@ -158,13 +163,19 @@ Found a bug? Have a suggestion? Join our community!
 
 ## 📝 **Changelog**
 
-### Version 1.0.0
-- Initial release with full targeting system
-- 3-page configuration GUI
-- Advanced control scheme
+### Version 1.1.0 - Enhanced Audio & Visual System
+- **Complete Target Lock Sound Effects System** - Professional audio feedback for all targeting actions
+- **Individual Sound Controls** - Separate enable/disable and volume controls for each sound type
+- **Smart Audio Logic** - Context-aware sound selection (lethal targets get special dramatic audio)
+- **Enhanced Visual Feedback** - Damage prediction, lethal target highlighting, vulnerability display
+- **Smart HUD Positioning** - Intelligent UI positioning that prevents cut-off at screen edges
+- **Universal Mod Compatibility** - Confirmed compatibility with weapon and entity mods
+
+### Version 1.0.0 - Initial Release
+- Full targeting system with intelligent target detection
+- 3-page configuration GUI with advanced controls
 - Better Third Person compatibility
-- Comprehensive audio system
-- Performance optimizations
+- Basic audio system and performance optimizations
 
 ---
 

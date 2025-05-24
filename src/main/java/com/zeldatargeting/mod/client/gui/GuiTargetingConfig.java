@@ -47,6 +47,23 @@ public class GuiTargetingConfig extends GuiScreen {
     private static final int SOUND_VOLUME_BUTTON = 120;
     private static final int UPDATE_FREQUENCY_BUTTON = 121;
     private static final int VALIDATION_INTERVAL_BUTTON = 122;
+    
+    // Enhanced Visual Feedback button IDs
+    private static final int SHOW_DAMAGE_PREDICTION_TOGGLE = 123;
+    private static final int SHOW_HITS_TO_KILL_TOGGLE = 124;
+    private static final int SHOW_VULNERABILITIES_TOGGLE = 125;
+    private static final int HIGHLIGHT_LETHAL_TARGETS_TOGGLE = 126;
+    private static final int DAMAGE_PREDICTION_SCALE_BUTTON = 127;
+    
+    // Enhanced Audio Settings button IDs
+    private static final int ENABLE_TARGET_LOCK_SOUND_TOGGLE = 128;
+    private static final int ENABLE_TARGET_SWITCH_SOUND_TOGGLE = 129;
+    private static final int ENABLE_LETHAL_TARGET_SOUND_TOGGLE = 130;
+    private static final int ENABLE_TARGET_LOST_SOUND_TOGGLE = 131;
+    private static final int TARGET_LOCK_VOLUME_BUTTON = 132;
+    private static final int TARGET_SWITCH_VOLUME_BUTTON = 133;
+    private static final int LETHAL_TARGET_VOLUME_BUTTON = 134;
+    private static final int TARGET_LOST_VOLUME_BUTTON = 135;
 
     public GuiTargetingConfig(GuiScreen parentScreen) {
         this.parentScreen = parentScreen;
@@ -112,6 +129,27 @@ public class GuiTargetingConfig extends GuiScreen {
 
                 addValueButton(RETICLE_SCALE_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Reticle Scale", TargetingConfig.reticleScale, 0.5f, 3.0f, 0.1f);
+                currentY += spacing + 10;
+
+                // Enhanced Visual Feedback section
+                addToggleButton(SHOW_DAMAGE_PREDICTION_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Show Damage Prediction", TargetingConfig.showDamagePrediction);
+                currentY += spacing;
+
+                addToggleButton(SHOW_HITS_TO_KILL_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Show Hits to Kill", TargetingConfig.showHitsToKill);
+                currentY += spacing;
+
+                addToggleButton(SHOW_VULNERABILITIES_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Show Vulnerabilities", TargetingConfig.showVulnerabilities);
+                currentY += spacing;
+
+                addToggleButton(HIGHLIGHT_LETHAL_TARGETS_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Highlight Lethal Targets", TargetingConfig.highlightLethalTargets);
+                currentY += spacing;
+
+                addValueButton(DAMAGE_PREDICTION_SCALE_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Damage Text Scale", TargetingConfig.damagePredictionScale, 0.5f, 2.0f, 0.1f);
                 break;
 
             case 1: // Camera Settings
@@ -164,6 +202,39 @@ public class GuiTargetingConfig extends GuiScreen {
 
                 addValueButton(SOUND_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Sound Volume", TargetingConfig.soundVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                // Enhanced Audio Settings
+                addToggleButton(ENABLE_TARGET_LOCK_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lock Sound", TargetingConfig.enableTargetLockSound);
+                currentY += spacing;
+
+                addValueButton(TARGET_LOCK_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lock Volume", TargetingConfig.targetLockVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                addToggleButton(ENABLE_TARGET_SWITCH_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Switch Sound", TargetingConfig.enableTargetSwitchSound);
+                currentY += spacing;
+
+                addValueButton(TARGET_SWITCH_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Switch Volume", TargetingConfig.targetSwitchVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                addToggleButton(ENABLE_LETHAL_TARGET_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Lethal Target Sound", TargetingConfig.enableLethalTargetSound);
+                currentY += spacing;
+
+                addValueButton(LETHAL_TARGET_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Lethal Target Volume", TargetingConfig.lethalTargetVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                addToggleButton(ENABLE_TARGET_LOST_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lost Sound", TargetingConfig.enableTargetLostSound);
+                currentY += spacing;
+
+                addValueButton(TARGET_LOST_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lost Volume", TargetingConfig.targetLostVolume, 0.0f, 1.0f, 0.05f);
                 currentY += spacing + 10;
 
                 addValueButton(UPDATE_FREQUENCY_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
@@ -339,7 +410,73 @@ public class GuiTargetingConfig extends GuiScreen {
                 TargetingConfig.enableSounds = !TargetingConfig.enableSounds;
                 button.displayString = "Enable Sounds: " + (TargetingConfig.enableSounds ? "ON" : "OFF");
                 break;
+            
+            // Enhanced Audio Settings toggles
+            case ENABLE_TARGET_LOCK_SOUND_TOGGLE:
+                TargetingConfig.enableTargetLockSound = !TargetingConfig.enableTargetLockSound;
+                button.displayString = "Target Lock Sound: " + (TargetingConfig.enableTargetLockSound ? "ON" : "OFF");
+                break;
+            case ENABLE_TARGET_SWITCH_SOUND_TOGGLE:
+                TargetingConfig.enableTargetSwitchSound = !TargetingConfig.enableTargetSwitchSound;
+                button.displayString = "Target Switch Sound: " + (TargetingConfig.enableTargetSwitchSound ? "ON" : "OFF");
+                break;
+            case ENABLE_LETHAL_TARGET_SOUND_TOGGLE:
+                TargetingConfig.enableLethalTargetSound = !TargetingConfig.enableLethalTargetSound;
+                button.displayString = "Lethal Target Sound: " + (TargetingConfig.enableLethalTargetSound ? "ON" : "OFF");
+                break;
+            case ENABLE_TARGET_LOST_SOUND_TOGGLE:
+                TargetingConfig.enableTargetLostSound = !TargetingConfig.enableTargetLostSound;
+                button.displayString = "Target Lost Sound: " + (TargetingConfig.enableTargetLostSound ? "ON" : "OFF");
+                break;
+            
+            // Enhanced Audio Volume buttons
+            case TARGET_LOCK_VOLUME_BUTTON:
+                float lockVolumeIncrement = isShiftPressed ? 0.01f : 0.05f;
+                TargetingConfig.targetLockVolume = cycleValue(TargetingConfig.targetLockVolume, 0.0f, 1.0f, lockVolumeIncrement, decrease);
+                button.displayString = "Target Lock Volume: " + String.format("%.2f", TargetingConfig.targetLockVolume);
+                break;
+            case TARGET_SWITCH_VOLUME_BUTTON:
+                float switchVolumeIncrement = isShiftPressed ? 0.01f : 0.05f;
+                TargetingConfig.targetSwitchVolume = cycleValue(TargetingConfig.targetSwitchVolume, 0.0f, 1.0f, switchVolumeIncrement, decrease);
+                button.displayString = "Target Switch Volume: " + String.format("%.2f", TargetingConfig.targetSwitchVolume);
+                break;
+            case LETHAL_TARGET_VOLUME_BUTTON:
+                float lethalVolumeIncrement = isShiftPressed ? 0.01f : 0.05f;
+                TargetingConfig.lethalTargetVolume = cycleValue(TargetingConfig.lethalTargetVolume, 0.0f, 1.0f, lethalVolumeIncrement, decrease);
+                button.displayString = "Lethal Target Volume: " + String.format("%.2f", TargetingConfig.lethalTargetVolume);
+                break;
+            case TARGET_LOST_VOLUME_BUTTON:
+                float lostVolumeIncrement = isShiftPressed ? 0.01f : 0.05f;
+                TargetingConfig.targetLostVolume = cycleValue(TargetingConfig.targetLostVolume, 0.0f, 1.0f, lostVolumeIncrement, decrease);
+                button.displayString = "Target Lost Volume: " + String.format("%.2f", TargetingConfig.targetLostVolume);
+                break;
+            
+            // Enhanced Visual Feedback toggles
+            case SHOW_DAMAGE_PREDICTION_TOGGLE:
+                TargetingConfig.showDamagePrediction = !TargetingConfig.showDamagePrediction;
+                button.displayString = "Show Damage Prediction: " + (TargetingConfig.showDamagePrediction ? "ON" : "OFF");
+                break;
+            case SHOW_HITS_TO_KILL_TOGGLE:
+                TargetingConfig.showHitsToKill = !TargetingConfig.showHitsToKill;
+                button.displayString = "Show Hits to Kill: " + (TargetingConfig.showHitsToKill ? "ON" : "OFF");
+                break;
+            case SHOW_VULNERABILITIES_TOGGLE:
+                TargetingConfig.showVulnerabilities = !TargetingConfig.showVulnerabilities;
+                button.displayString = "Show Vulnerabilities: " + (TargetingConfig.showVulnerabilities ? "ON" : "OFF");
+                break;
+            case HIGHLIGHT_LETHAL_TARGETS_TOGGLE:
+                TargetingConfig.highlightLethalTargets = !TargetingConfig.highlightLethalTargets;
+                button.displayString = "Highlight Lethal Targets: " + (TargetingConfig.highlightLethalTargets ? "ON" : "OFF");
+                break;
+            case DAMAGE_PREDICTION_SCALE_BUTTON:
+                float scaleIncrement2 = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.damagePredictionScale = cycleValue(TargetingConfig.damagePredictionScale, 0.5f, 2.0f, scaleIncrement2, decrease);
+                button.displayString = "Damage Text Scale: " + String.format("%.2f", TargetingConfig.damagePredictionScale);
+                break;
         }
+        
+        // Automatically save config after any change
+        TargetingConfig.saveConfig();
     }
 
     private float cycleValue(float currentValue, float minValue, float maxValue, float increment, boolean decrease) {
@@ -373,6 +510,8 @@ public class GuiTargetingConfig extends GuiScreen {
                 TargetingConfig.btpCompatibilityMode = "gentle";
                 break;
         }
+        // Save config after BTP mode change
+        TargetingConfig.saveConfig();
     }
 
     @Override

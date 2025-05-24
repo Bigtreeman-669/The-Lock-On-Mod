@@ -8,3 +8,20 @@ key.zeldatargeting.cycle_right=Cycle Target Right
 zeldatargeting.target.locked=Target Locked: %s
 zeldatargeting.target.lost=Target Lost
 zeldatargeting.target.switched=Target Switched: %s
+
+# Enhanced Visual Feedback
+config.zeldatargeting.showDamagePrediction=Show damage prediction when targeting entities
+config.zeldatargeting.showHitsToKill=Show number of hits required to kill target
+config.zeldatargeting.showVulnerabilities=Show target vulnerabilities and resistances
+config.zeldatargeting.highlightLethalTargets=Highlight targets that can be killed in one hit
+config.zeldatargeting.damagePredictionScale=Scale of damage prediction text display
+
+# Audio Settings
+config.zeldatargeting.enableTargetLockSound=Enable sound when locking onto targets
+config.zeldatargeting.enableTargetSwitchSound=Enable sound when switching between targets
+config.zeldatargeting.enableLethalTargetSound=Enable special sound for lethal targets
+config.zeldatargeting.enableTargetLostSound=Enable sound when losing target lock
+config.zeldatargeting.targetLockVolume=Volume of target lock sound
+config.zeldatargeting.targetSwitchVolume=Volume of target switch sound
+config.zeldatargeting.lethalTargetVolume=Volume of lethal target sound
+config.zeldatargeting.targetLostVolume=Volume of target lost sound

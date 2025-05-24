@@ -1,6 +1,7 @@
 package com.zeldatargeting.mod.client;
 
 import com.zeldatargeting.mod.ZeldaTargetingMod;
+import com.zeldatargeting.mod.client.audio.TargetingSounds;
 import com.zeldatargeting.mod.client.targeting.EntityDetector;
 import com.zeldatargeting.mod.client.targeting.CameraController;
 import com.zeldatargeting.mod.client.targeting.TargetTracker;
@@ -73,6 +74,8 @@ public class TargetingManager {
                 Entity newTarget = entityDetector.findNearestTarget();
                 if (newTarget != null) {
                     setTarget(newTarget);
+                    // Play target switch sound for automatic retargeting
+                    TargetingSounds.playTargetSwitchSound();
                 } else {
                     disableLockOn();
                 }
@@ -97,6 +100,9 @@ public class TargetingManager {
             setTarget(target);
             isActive = true;
             
+            // Play target lock sound
+            TargetingSounds.playTargetLockSound(target);
+            
             // Handle auto third-person switching
             if (TargetingConfig.autoThirdPerson) {
                 Minecraft mc = Minecraft.getMinecraft();
@@ -112,6 +118,9 @@ public class TargetingManager {
     
     private void disableLockOn() {
         if (isActive) {
+            // Play target lost sound
+            TargetingSounds.playTargetLostSound();
+            
             // Restore previous perspective if auto third-person was used
             if (TargetingConfig.autoThirdPerson) {
                 Minecraft mc = Minecraft.getMinecraft();
@@ -134,6 +143,10 @@ public class TargetingManager {
         Entity newTarget = entityDetector.findNextTarget(currentTarget, forward);
         if (newTarget != null && newTarget != currentTarget) {
             setTarget(newTarget);
+            
+            // Play target switch sound
+            TargetingSounds.playTargetSwitchSound();
+            
             ZeldaTargetingMod.getLogger().debug("Cycled to new target: " + newTarget.getName());
         }
     }

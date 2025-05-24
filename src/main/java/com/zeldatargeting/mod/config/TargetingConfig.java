@@ -43,6 +43,23 @@ public class TargetingConfig {
     public static boolean enableSounds = true;
     public static float soundVolume = 1.0f;
     
+    // Enhanced Audio Settings
+    public static boolean enableTargetLockSound = true;
+    public static boolean enableTargetSwitchSound = true;
+    public static boolean enableLethalTargetSound = true;
+    public static boolean enableTargetLostSound = true;
+    public static float targetLockVolume = 0.7f;
+    public static float targetSwitchVolume = 0.4f;
+    public static float lethalTargetVolume = 0.8f;
+    public static float targetLostVolume = 0.5f;
+    
+    // Enhanced Visual Feedback Settings
+    public static boolean showDamagePrediction = true;
+    public static boolean showHitsToKill = true;
+    public static boolean showVulnerabilities = true;
+    public static boolean highlightLethalTargets = true;
+    public static float damagePredictionScale = 1.0f;
+    
     // Performance Settings
     public static int updateFrequency = 1; // ticks between updates
     public static int validationInterval = 10; // ticks between target validation
@@ -112,6 +129,36 @@ public class TargetingConfig {
             soundVolume = config.getFloat("soundVolume", "audio", soundVolume, 0.0f, 1.0f,
                 "Volume of targeting sound effects");
             
+            // Enhanced Audio Settings
+            enableTargetLockSound = config.getBoolean("enableTargetLockSound", "audio", enableTargetLockSound,
+                "Enable sound when locking onto targets");
+            enableTargetSwitchSound = config.getBoolean("enableTargetSwitchSound", "audio", enableTargetSwitchSound,
+                "Enable sound when switching between targets");
+            enableLethalTargetSound = config.getBoolean("enableLethalTargetSound", "audio", enableLethalTargetSound,
+                "Enable special sound for lethal targets");
+            enableTargetLostSound = config.getBoolean("enableTargetLostSound", "audio", enableTargetLostSound,
+                "Enable sound when losing target lock");
+            targetLockVolume = config.getFloat("targetLockVolume", "audio", targetLockVolume, 0.0f, 1.0f,
+                "Volume of target lock sound");
+            targetSwitchVolume = config.getFloat("targetSwitchVolume", "audio", targetSwitchVolume, 0.0f, 1.0f,
+                "Volume of target switch sound");
+            lethalTargetVolume = config.getFloat("lethalTargetVolume", "audio", lethalTargetVolume, 0.0f, 1.0f,
+                "Volume of lethal target sound");
+            targetLostVolume = config.getFloat("targetLostVolume", "audio", targetLostVolume, 0.0f, 1.0f,
+                "Volume of target lost sound");
+            
+            // Enhanced Visual Feedback Settings
+            showDamagePrediction = config.getBoolean("showDamagePrediction", "visual_feedback", showDamagePrediction,
+                "Show damage prediction when targeting entities");
+            showHitsToKill = config.getBoolean("showHitsToKill", "visual_feedback", showHitsToKill,
+                "Show number of hits required to kill target");
+            showVulnerabilities = config.getBoolean("showVulnerabilities", "visual_feedback", showVulnerabilities,
+                "Show target vulnerabilities and resistances");
+            highlightLethalTargets = config.getBoolean("highlightLethalTargets", "visual_feedback", highlightLethalTargets,
+                "Highlight targets that can be killed in one hit");
+            damagePredictionScale = config.getFloat("damagePredictionScale", "visual_feedback", damagePredictionScale, 0.5f, 2.0f,
+                "Scale of damage prediction text");
+            
             // Performance Settings
             updateFrequency = config.getInt("updateFrequency", "performance", updateFrequency, 1, 20,
                 "Ticks between targeting system updates (higher = better performance, lower responsiveness)");
@@ -157,6 +204,20 @@ public class TargetingConfig {
                 
                 config.get("audio", "enableSounds", enableSounds).set(enableSounds);
                 config.get("audio", "soundVolume", soundVolume).set(soundVolume);
+                config.get("audio", "enableTargetLockSound", enableTargetLockSound).set(enableTargetLockSound);
+                config.get("audio", "enableTargetSwitchSound", enableTargetSwitchSound).set(enableTargetSwitchSound);
+                config.get("audio", "enableLethalTargetSound", enableLethalTargetSound).set(enableLethalTargetSound);
+                config.get("audio", "enableTargetLostSound", enableTargetLostSound).set(enableTargetLostSound);
+                config.get("audio", "targetLockVolume", targetLockVolume).set(targetLockVolume);
+                config.get("audio", "targetSwitchVolume", targetSwitchVolume).set(targetSwitchVolume);
+                config.get("audio", "lethalTargetVolume", lethalTargetVolume).set(lethalTargetVolume);
+                config.get("audio", "targetLostVolume", targetLostVolume).set(targetLostVolume);
+                
+                config.get("visual_feedback", "showDamagePrediction", showDamagePrediction).set(showDamagePrediction);
+                config.get("visual_feedback", "showHitsToKill", showHitsToKill).set(showHitsToKill);
+                config.get("visual_feedback", "showVulnerabilities", showVulnerabilities).set(showVulnerabilities);
+                config.get("visual_feedback", "highlightLethalTargets", highlightLethalTargets).set(highlightLethalTargets);
+                config.get("visual_feedback", "damagePredictionScale", damagePredictionScale).set(damagePredictionScale);
                 
                 config.get("performance", "updateFrequency", updateFrequency).set(updateFrequency);
                 config.get("performance", "validationInterval", validationInterval).set(validationInterval);
@@ -200,6 +261,20 @@ public class TargetingConfig {
         
         enableSounds = true;
         soundVolume = 1.0f;
+        enableTargetLockSound = true;
+        enableTargetSwitchSound = true;
+        enableLethalTargetSound = true;
+        enableTargetLostSound = true;
+        targetLockVolume = 0.7f;
+        targetSwitchVolume = 0.4f;
+        lethalTargetVolume = 0.8f;
+        targetLostVolume = 0.5f;
+        
+        showDamagePrediction = true;
+        showHitsToKill = true;
+        showVulnerabilities = true;
+        highlightLethalTargets = true;
+        damagePredictionScale = 1.0f;
         
         updateFrequency = 1;
         validationInterval = 10;

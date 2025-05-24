@@ -1,6 +1,8 @@
 package com.zeldatargeting.mod.client.render;
 
 import com.zeldatargeting.mod.client.TargetingManager;
+import com.zeldatargeting.mod.client.combat.DamageCalculator;
+import com.zeldatargeting.mod.config.TargetingConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -104,12 +106,40 @@ public class TargetRenderer {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         
-        // Set color (red for enemies, blue for neutrals)
-        GlStateManager.color(1.0f, 0.2f, 0.2f, 0.8f);
+        // Get current target for enhanced coloring
+        TargetingManager manager = TargetingManager.getInstance();
+        Entity target = manager != null ? manager.getCurrentTarget() : null;
+        
+        // Enhanced color system based on lethality and target type
+        float red = 1.0f, green = 0.2f, blue = 0.2f, alpha = 0.8f;
+        
+        if (target instanceof EntityLiving && TargetingConfig.highlightLethalTargets) {
+            int hitsToKill = DamageCalculator.calculateHitsToKill(target);
+            if (hitsToKill == 1) {
+                // Bright pulsing red for lethal targets
+                float pulse = (float) (0.8 + 0.2 * Math.sin(System.currentTimeMillis() * 0.015));
+                red = 1.0f;
+                green = 0.1f * pulse;
+                blue = 0.1f * pulse;
+                alpha = 0.9f + 0.1f * pulse;
+            } else if (hitsToKill <= 3) {
+                // Orange for low-hit targets
+                red = 1.0f;
+                green = 0.6f;
+                blue = 0.1f;
+            } else {
+                // Standard red for normal targets
+                red = 1.0f;
+                green = 0.2f;
+                blue = 0.2f;
+            }
+        }
+        
+        GlStateManager.color(red, green, blue, alpha);
         
         buffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION);
         
-        // Draw circular reticle
+        // Draw circular reticle with enhanced thickness for lethal targets
         int segments = 32;
         for (int i = 0; i < segments; i++) {
             double angle = 2.0 * Math.PI * i / segments;
@@ -119,6 +149,25 @@ public class TargetRenderer {
         }
         
         tessellator.draw();
+        
+        // Draw additional inner ring for lethal targets
+        if (target instanceof EntityLiving && TargetingConfig.highlightLethalTargets) {
+            int hitsToKill = DamageCalculator.calculateHitsToKill(target);
+            if (hitsToKill == 1) {
+                GlStateManager.color(1.0f, 0.8f, 0.0f, 0.6f); // Golden inner ring
+                buffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION);
+                
+                float innerWidth = width * 0.7f;
+                for (int i = 0; i < segments; i++) {
+                    double angle = 2.0 * Math.PI * i / segments;
+                    double offsetX = Math.cos(angle) * innerWidth;
+                    double offsetZ = Math.sin(angle) * innerWidth;
+                    buffer.pos(x + offsetX, y, z + offsetZ).endVertex();
+                }
+                
+                tessellator.draw();
+            }
+        }
         
         // Draw corner brackets
         drawCornerBrackets(x, y, z, width, height);
@@ -164,18 +213,88 @@ public class TargetRenderer {
     
     private void render2DHUD(Entity target, ScaledResolution resolution) {
         int screenWidth = resolution.getScaledWidth();
+        int screenHeight = resolution.getScaledHeight();
         
-        // Draw target info in top-right corner
+        // Calculate all text widths to determine maximum HUD width
         String targetName = target.getName();
         int nameWidth = mc.fontRenderer.getStringWidth(targetName);
-        int x = screenWidth - nameWidth - 10;
+        int maxWidth = nameWidth;
+        
+        // Check damage prediction text width
+        String damageText = "";
+        if (target instanceof EntityLiving && TargetingConfig.showDamagePrediction) {
+            damageText = DamageCalculator.getDamagePredictionText(target);
+            if (!damageText.isEmpty()) {
+                int damageWidth = (int)(mc.fontRenderer.getStringWidth(damageText) * TargetingConfig.damagePredictionScale);
+                maxWidth = Math.max(maxWidth, damageWidth);
+            }
+        }
+        
+        // Check vulnerability text width
+        String vulnText = "";
+        if (target instanceof EntityLiving && TargetingConfig.showVulnerabilities) {
+            vulnText = DamageCalculator.getVulnerabilityText((EntityLiving)target);
+            if (!vulnText.isEmpty()) {
+                maxWidth = Math.max(maxWidth, mc.fontRenderer.getStringWidth(vulnText));
+            }
+        }
+        
+        // Health bar is always 100 pixels wide
+        if (target instanceof EntityLiving) {
+            maxWidth = Math.max(maxWidth, 100);
+        }
+        
+        // Distance text width
+        if (TargetingConfig.showDistance) {
+            double distance = mc.player.getDistanceSq(target);
+            String distanceText = String.format("%.1fm", Math.sqrt(distance));
+            maxWidth = Math.max(maxWidth, mc.fontRenderer.getStringWidth(distanceText));
+        }
+        
+        // Smart positioning: ensure HUD stays on screen
+        int padding = 16; // Total padding (8 on each side)
+        int hudWidth = maxWidth + padding;
+        int x = Math.min(screenWidth - hudWidth, screenWidth - nameWidth - 10);
+        x = Math.max(10, x); // Ensure minimum distance from left edge
         int y = 10;
         
-        // Background
-        Gui.drawRect(x - 5, y - 2, x + nameWidth + 5, y + 12, 0x80000000);
+        // Calculate total HUD height for proper background sizing
+        int hudHeight = 12; // Base height for name
+        if (target instanceof EntityLiving) {
+            hudHeight += 25; // Health bar and text
+            if (TargetingConfig.showDamagePrediction && !damageText.isEmpty()) {
+                hudHeight += 12; // Damage prediction
+            }
+            if (TargetingConfig.showVulnerabilities && !vulnText.isEmpty()) {
+                hudHeight += 12; // Vulnerability info
+            }
+        }
+        if (TargetingConfig.showDistance) {
+            hudHeight += 12; // Distance
+        }
         
-        // Target name
-        mc.fontRenderer.drawString(targetName, x, y, 0xFFFFFF);
+        // Ensure HUD doesn't go off bottom of screen
+        if (y + hudHeight > screenHeight - 10) {
+            y = screenHeight - hudHeight - 10;
+        }
+        
+        // Enhanced background with better visibility
+        Gui.drawRect(x - 8, y - 2, x + hudWidth, y + hudHeight, 0x90000000);
+        
+        // Target name with enhanced lethal highlighting
+        int nameColor = 0xFFFFFF;
+        if (TargetingConfig.highlightLethalTargets && target instanceof EntityLiving) {
+            int hitsToKill = DamageCalculator.calculateHitsToKill(target);
+            if (hitsToKill == 1) {
+                nameColor = 0xFFFF4444; // Bright red for lethal targets
+                // Add pulsing effect for lethal targets
+                float pulse = (float) (0.8 + 0.2 * Math.sin(System.currentTimeMillis() * 0.01));
+                nameColor = (int)(255 * pulse) << 16 | 0xFF4444;
+            }
+        }
+        mc.fontRenderer.drawString(targetName, x, y, nameColor);
+        
+        int currentY = y + 15;
         
         // Health bar for living entities
         if (target instanceof EntityLiving) {
@@ -187,24 +306,54 @@ public class TargetRenderer {
             int barWidth = 100;
             int barHeight = 4;
             int barX = x;
-            int barY = y + 15;
+            int barY = currentY;
             
             // Health bar background
             Gui.drawRect(barX - 1, barY - 1, barX + barWidth + 1, barY + barHeight + 1, 0xFF000000);
             
-            // Health bar
-            int healthColor = healthRatio > 0.5f ? 0xFF00FF00 : (healthRatio > 0.25f ? 0xFFFFFF00 : 0xFFFF0000);
+            // Health bar with enhanced colors
+            int healthColor = healthRatio > 0.75f ? 0xFF00FF00 :
+                             (healthRatio > 0.5f ? 0xFF88FF00 :
+                             (healthRatio > 0.25f ? 0xFFFFFF00 : 0xFFFF0000));
             Gui.drawRect(barX, barY, barX + (int)(barWidth * healthRatio), barY + barHeight, healthColor);
             
             // Health text
             String healthText = String.format("%.1f/%.1f", health, maxHealth);
             mc.fontRenderer.drawString(healthText, barX, barY + 8, 0xFFFFFF);
+            currentY += 20;
+            
+            // Damage prediction display
+            if (TargetingConfig.showDamagePrediction && !damageText.isEmpty()) {
+                int damageColor = DamageCalculator.getDamagePredictionColor(target);
+                
+                // Scale the text if configured
+                if (TargetingConfig.damagePredictionScale != 1.0f) {
+                    GlStateManager.pushMatrix();
+                    GlStateManager.scale(TargetingConfig.damagePredictionScale, TargetingConfig.damagePredictionScale, 1.0f);
+                    int scaledX = (int)(x / TargetingConfig.damagePredictionScale);
+                    int scaledY = (int)(currentY / TargetingConfig.damagePredictionScale);
+                    mc.fontRenderer.drawString(damageText, scaledX, scaledY, damageColor);
+                    GlStateManager.popMatrix();
+                } else {
+                    mc.fontRenderer.drawString(damageText, x, currentY, damageColor);
+                }
+                currentY += 12;
+            }
+            
+            // Vulnerability indicators
+            if (TargetingConfig.showVulnerabilities && !vulnText.isEmpty()) {
+                int vulnColor = DamageCalculator.getVulnerabilityColor(living);
+                mc.fontRenderer.drawString(vulnText, x, currentY, vulnColor);
+                currentY += 12;
+            }
         }
         
         // Distance indicator
-        double distance = mc.player.getDistanceSq(target);
-        String distanceText = String.format("%.1fm", Math.sqrt(distance));
-        mc.fontRenderer.drawString(distanceText, x, y + 35, 0xAAAAAA);
+        if (TargetingConfig.showDistance) {
+            double distance = mc.player.getDistanceSq(target);
+            String distanceText = String.format("%.1fm", Math.sqrt(distance));
+            mc.fontRenderer.drawString(distanceText, x, currentY, 0xAAAAAA);
+        }
     }
     
     private void renderRedIndicator(Entity target, float partialTicks) {
