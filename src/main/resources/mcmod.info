@@ -1,0 +1,16 @@
+[
+{
+  "modid": "zeldatargeting",
+  "name": "Zelda Targeting",
+  "description": "A sophisticated lock-on targeting system inspired by The Legend of Zelda: Breath of the Wild and Tears of the Kingdom. Features smooth camera transitions, visual targeting indicators, configurable settings, and seamless integration with Minecraft's combat system.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Bigtreeman669"],
+  "credits": "Inspired by The Legend of Zelda series by Nintendo. Built with Minecraft Forge.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
