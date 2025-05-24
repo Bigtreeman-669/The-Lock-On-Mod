@@ -58,3 +58,6 @@ run/
 
 # Memory Bank Documentation (keep local only)
 cline_docs/
+
+# Roo Modes Configuration (keep local only)
+.roomodes
