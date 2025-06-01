@@ -51,7 +51,7 @@ Transform your Minecraft combat with modern targeting mechanics, complete audio 
 
 ## 📝 Changelog
 
-### Version 1.1.0 - Enhanced Audio & Visual System
+### Version 1.1.2 - Enhanced Audio & Visual System
 - **Complete Target Lock Sound Effects System** - Professional audio feedback for all targeting actions
 - **Individual Sound Controls** - Separate enable/disable and volume controls for each sound type
 - **Smart Audio Logic** - Context-aware sound selection (lethal targets get special dramatic audio)

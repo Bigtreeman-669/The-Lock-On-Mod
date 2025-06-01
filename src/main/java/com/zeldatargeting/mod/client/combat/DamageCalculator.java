@@ -131,6 +131,10 @@ public class DamageCalculator {
             }
         }
         
+        // REAL-TIME ATTACK COOLDOWN CALCULATION
+        float attackCooldown = getAttackCooldownProgress(player);
+        baseDamage = 0.2f + baseDamage * attackCooldown * attackCooldown; // MC 1.12.2 attack damage formula
+        
         // Apply enchantments
         baseDamage += EnchantmentHelper.getModifierForCreature(weapon, target.getCreatureAttribute());
         
@@ -152,19 +156,63 @@ public class DamageCalculator {
             }
         }
         
-        // Apply critical hit multiplier (simplified - assumes full charge)
-        if (canCriticalHit(player)) {
+        // REAL-TIME CRITICAL HIT AND SPRINT CALCULATIONS
+        boolean wouldCrit = canCriticalHit(player) && attackCooldown > 0.9f;
+        boolean isSprinting = player.isSprinting() && !wouldCrit; // Sprinting prevents crits
+        
+        if (wouldCrit) {
             baseDamage *= 1.5f;
+        } else if (isSprinting) {
+            // Knockback but no extra damage in 1.12.2
+            // baseDamage remains the same
         }
+        
+        // Apply target's armor and resistance
+        baseDamage = applyArmorReduction(baseDamage, target);
         
         return Math.max(0, baseDamage);
     }
     
     private static boolean canCriticalHit(EntityPlayer player) {
-        // Simplified critical hit check
-        return player.fallDistance > 0.0f && !player.onGround && !player.isOnLadder() && 
-               !player.isInWater() && !player.isPotionActive(net.minecraft.init.MobEffects.BLINDNESS) && 
-               !player.isRiding();
+        // Real critical hit conditions for MC 1.12.2
+        return player.fallDistance > 0.0f && !player.onGround && !player.isOnLadder() &&
+               !player.isInWater() && !player.isPotionActive(net.minecraft.init.MobEffects.BLINDNESS) &&
+               !player.isRiding() && !player.isSprinting();
+    }
+    
+    /**
+     * Get the real-time attack cooldown progress (0.0 to 1.0)
+     */
+    private static float getAttackCooldownProgress(EntityPlayer player) {
+        // MC 1.12.2 attack cooldown calculation
+        return player.getCooledAttackStrength(0.5f); // 0.5f is partial tick adjustment
+    }
+    
+    /**
+     * Apply armor damage reduction based on target's armor and toughness
+     */
+    private static float applyArmorReduction(float damage, EntityLiving target) {
+        // Get target's armor value
+        int armor = target.getTotalArmorValue();
+        
+        // Get armor toughness (MC 1.12.2 feature)
+        float toughness = (float) target.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue();
+        
+        // Apply damage reduction formula from MC 1.12.2
+        float armorReduction = Math.min(20.0f, Math.max(armor / 5.0f, armor - damage / (2.0f + toughness / 4.0f)));
+        float damageMultiplier = 1.0f - (armorReduction / 25.0f);
+        
+        // Apply resistance potion effect
+        if (target.isPotionActive(net.minecraft.init.MobEffects.RESISTANCE)) {
+            PotionEffect resistance = target.getActivePotionEffect(net.minecraft.init.MobEffects.RESISTANCE);
+            if (resistance != null) {
+                int amplifier = resistance.getAmplifier();
+                float resistanceReduction = (amplifier + 1) * 0.2f; // 20% per level
+                damageMultiplier *= (1.0f - Math.min(1.0f, resistanceReduction));
+            }
+        }
+        
+        return damage * damageMultiplier;
     }
     
     /**

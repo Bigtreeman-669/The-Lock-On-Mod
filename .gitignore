@@ -1,1 +1,42 @@
+# Gradle files
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
 
+# IDE files
+.idea/
+.vscode/settings.json
+*.iml
+*.ipr
+*.iws
+
+# Eclipse files
+.project
+.classpath
+.settings/
+bin/
+
+# Runtime directories
+run/
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Minecraft development
+.mcp/
+eclipse/
+src/main/generated/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+
+# Build outputs
+*.jar
+!gradle/wrapper/gradle-wrapper.jar

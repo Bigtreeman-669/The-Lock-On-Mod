@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 public class ZeldaTargetingMod {
     public static final String MODID = "zeldatargeting";
     public static final String NAME = "Zelda Targeting";
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "1.1.2";
     
     @Mod.Instance(MODID)
     public static ZeldaTargetingMod instance;
@@ -42,6 +42,9 @@ public class ZeldaTargetingMod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         logger.info("Zelda Targeting Mod - Initialization");
+        
+        // Note: Removed network initialization as it's not needed for this client-side mod
+        // and was causing crashes due to FML networking changes
         
         proxy.init(event);
     }

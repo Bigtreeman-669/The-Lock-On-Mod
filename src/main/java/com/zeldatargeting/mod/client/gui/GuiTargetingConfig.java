@@ -15,7 +15,7 @@ import java.io.IOException;
 public class GuiTargetingConfig extends GuiScreen {
     private final GuiScreen parentScreen;
     private int currentPage = 0;
-    private final int totalPages = 3;
+    private final int totalPages = 5; // Added sound tweaking + damage numbers pages
     
     // Button IDs
     private static final int DONE_BUTTON = 0;
@@ -64,6 +64,26 @@ public class GuiTargetingConfig extends GuiScreen {
     private static final int TARGET_SWITCH_VOLUME_BUTTON = 133;
     private static final int LETHAL_TARGET_VOLUME_BUTTON = 134;
     private static final int TARGET_LOST_VOLUME_BUTTON = 135;
+    
+    // Advanced Sound Tweaking button IDs
+    private static final int SOUND_THEME_BUTTON = 136;
+    private static final int TARGET_LOCK_PITCH_BUTTON = 137;
+    private static final int TARGET_SWITCH_PITCH_BUTTON = 138;
+    private static final int LETHAL_TARGET_PITCH_BUTTON = 139;
+    private static final int TARGET_LOST_PITCH_BUTTON = 140;
+    private static final int ENABLE_SOUND_VARIETY_TOGGLE = 141;
+    
+    // Damage Numbers Configuration button IDs
+    private static final int ENABLE_DAMAGE_NUMBERS_TOGGLE = 142;
+    private static final int DAMAGE_NUMBERS_SCALE_BUTTON = 143;
+    private static final int DAMAGE_NUMBERS_DURATION_BUTTON = 144;
+    private static final int DAMAGE_NUMBERS_CRITS_TOGGLE = 145;
+    private static final int DAMAGE_NUMBERS_COLORS_TOGGLE = 146;
+    private static final int DAMAGE_NUMBERS_COLOR_BUTTON = 147;
+    private static final int CRITICAL_DAMAGE_COLOR_BUTTON = 148;
+    private static final int LETHAL_DAMAGE_COLOR_BUTTON = 149;
+    private static final int DAMAGE_NUMBERS_FADEOUT_TOGGLE = 150;
+    private static final int DAMAGE_NUMBERS_OFFSET_BUTTON = 151;
 
     public GuiTargetingConfig(GuiScreen parentScreen) {
         this.parentScreen = parentScreen;
@@ -73,23 +93,34 @@ public class GuiTargetingConfig extends GuiScreen {
     public void initGui() {
         this.buttonList.clear();
 
-        int centerX = this.width / 2;
-        int startY = 60;
-        int buttonWidth = 200;
-        int buttonHeight = 20;
-        int spacing = 25;
+        // Calculate GUI scale factor for proper scaling
+        int scaleFactor = this.mc.gameSettings.guiScale;
+        if (scaleFactor == 0) scaleFactor = 1000;
+        int scaledWidth = this.mc.displayWidth / scaleFactor;
+        int scaledHeight = this.mc.displayHeight / scaleFactor;
+        
+        // Use the smaller of actual screen dimensions or scaled dimensions for safety
+        int effectiveWidth = Math.min(this.width, scaledWidth);
+        int effectiveHeight = Math.min(this.height, scaledHeight);
+        
+        int centerX = effectiveWidth / 2;
+        int startY = Math.max(45, effectiveHeight / 10); // Dynamic start position
+        int buttonWidth = Math.min(200, effectiveWidth - 40); // Ensure buttons fit
+        int buttonHeight = 18; // Slightly smaller for better fit
+        int spacing = Math.max(20, Math.min(25, (effectiveHeight - startY - 80) / 15)); // Dynamic spacing
 
-        // Page navigation buttons
+        // Page navigation buttons - positioned dynamically
+        int buttonY = effectiveHeight - 25;
         if (currentPage > 0) {
-            this.buttonList.add(new GuiButton(PREV_PAGE_BUTTON, centerX - 210, this.height - 30, 100, 20, "< Previous"));
+            this.buttonList.add(new GuiButton(PREV_PAGE_BUTTON, centerX - 210, buttonY, 100, 20, "< Previous"));
         }
         if (currentPage < totalPages - 1) {
-            this.buttonList.add(new GuiButton(NEXT_PAGE_BUTTON, centerX + 110, this.height - 30, 100, 20, "Next >"));
+            this.buttonList.add(new GuiButton(NEXT_PAGE_BUTTON, centerX + 110, buttonY, 100, 20, "Next >"));
         }
 
         // Control buttons
-        this.buttonList.add(new GuiButton(DONE_BUTTON, centerX - 100, this.height - 30, 95, 20, I18n.format("gui.done")));
-        this.buttonList.add(new GuiButton(RESET_BUTTON, centerX + 5, this.height - 30, 95, 20, "Reset"));
+        this.buttonList.add(new GuiButton(DONE_BUTTON, centerX - 100, buttonY, 95, 20, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(RESET_BUTTON, centerX + 5, buttonY, 95, 20, "Reset"));
 
         int currentY = startY;
 
@@ -183,7 +214,7 @@ public class GuiTargetingConfig extends GuiScreen {
                 }
                 break;
 
-            case 2: // Entity Filtering, Audio & Performance
+            case 2: // Entity Filtering & Basic Audio
                 addToggleButton(TARGET_HOSTILES_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Target Hostile Mobs", TargetingConfig.targetHostileMobs);
                 currentY += spacing;
@@ -201,40 +232,24 @@ public class GuiTargetingConfig extends GuiScreen {
                 currentY += spacing;
 
                 addValueButton(SOUND_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
-                        "Sound Volume", TargetingConfig.soundVolume, 0.0f, 1.0f, 0.05f);
-                currentY += spacing;
+                        "Master Sound Volume", TargetingConfig.soundVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing + 10;
 
-                // Enhanced Audio Settings
+                // Basic sound toggle controls
                 addToggleButton(ENABLE_TARGET_LOCK_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Target Lock Sound", TargetingConfig.enableTargetLockSound);
-                currentY += spacing;
-
-                addValueButton(TARGET_LOCK_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
-                        "Target Lock Volume", TargetingConfig.targetLockVolume, 0.0f, 1.0f, 0.05f);
                 currentY += spacing;
 
                 addToggleButton(ENABLE_TARGET_SWITCH_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Target Switch Sound", TargetingConfig.enableTargetSwitchSound);
                 currentY += spacing;
 
-                addValueButton(TARGET_SWITCH_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
-                        "Target Switch Volume", TargetingConfig.targetSwitchVolume, 0.0f, 1.0f, 0.05f);
-                currentY += spacing;
-
                 addToggleButton(ENABLE_LETHAL_TARGET_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Lethal Target Sound", TargetingConfig.enableLethalTargetSound);
                 currentY += spacing;
 
-                addValueButton(LETHAL_TARGET_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
-                        "Lethal Target Volume", TargetingConfig.lethalTargetVolume, 0.0f, 1.0f, 0.05f);
-                currentY += spacing;
-
                 addToggleButton(ENABLE_TARGET_LOST_SOUND_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Target Lost Sound", TargetingConfig.enableTargetLostSound);
-                currentY += spacing;
-
-                addValueButton(TARGET_LOST_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
-                        "Target Lost Volume", TargetingConfig.targetLostVolume, 0.0f, 1.0f, 0.05f);
                 currentY += spacing + 10;
 
                 addValueButton(UPDATE_FREQUENCY_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
@@ -243,6 +258,92 @@ public class GuiTargetingConfig extends GuiScreen {
 
                 addValueButton(VALIDATION_INTERVAL_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
                         "Validation Interval", (float)TargetingConfig.validationInterval, 1.0f, 60.0f, 1.0f);
+                break;
+
+            case 3: // Advanced Sound Tweaking
+                // Sound Theme Selection
+                addSoundThemeButton(SOUND_THEME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Sound Theme", TargetingConfig.soundTheme);
+                currentY += spacing;
+
+                addToggleButton(ENABLE_SOUND_VARIETY_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Sound Variety", TargetingConfig.enableSoundVariety);
+                currentY += spacing + 10;
+
+                // Volume Controls
+                addValueButton(TARGET_LOCK_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lock Volume", TargetingConfig.targetLockVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                addValueButton(TARGET_SWITCH_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Switch Volume", TargetingConfig.targetSwitchVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                addValueButton(LETHAL_TARGET_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Lethal Target Volume", TargetingConfig.lethalTargetVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing;
+
+                addValueButton(TARGET_LOST_VOLUME_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lost Volume", TargetingConfig.targetLostVolume, 0.0f, 1.0f, 0.05f);
+                currentY += spacing + 10;
+
+                // Pitch Controls
+                addValueButton(TARGET_LOCK_PITCH_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lock Pitch", TargetingConfig.targetLockPitch, 0.5f, 2.0f, 0.1f);
+                currentY += spacing;
+
+                addValueButton(TARGET_SWITCH_PITCH_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Switch Pitch", TargetingConfig.targetSwitchPitch, 0.5f, 2.0f, 0.1f);
+                currentY += spacing;
+
+                addValueButton(LETHAL_TARGET_PITCH_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Lethal Target Pitch", TargetingConfig.lethalTargetPitch, 0.5f, 2.0f, 0.1f);
+                currentY += spacing;
+
+                addValueButton(TARGET_LOST_PITCH_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Target Lost Pitch", TargetingConfig.targetLostPitch, 0.5f, 2.0f, 0.1f);
+                break;
+                
+            case 4: // Damage Numbers Configuration
+                addToggleButton(ENABLE_DAMAGE_NUMBERS_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Enable Damage Numbers", TargetingConfig.enableDamageNumbers);
+                currentY += spacing;
+                
+                addValueButton(DAMAGE_NUMBERS_SCALE_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Damage Numbers Scale", TargetingConfig.damageNumbersScale, 0.5f, 3.0f, 0.1f);
+                currentY += spacing;
+                
+                addValueButton(DAMAGE_NUMBERS_DURATION_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Duration (ticks)", (float)TargetingConfig.damageNumbersDuration, 20.0f, 200.0f, 10.0f);
+                currentY += spacing;
+                
+                addValueButton(DAMAGE_NUMBERS_OFFSET_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Vertical Offset", TargetingConfig.damageNumbersOffset, 0.0f, 2.0f, 0.1f);
+                currentY += spacing + 10;
+                
+                addToggleButton(DAMAGE_NUMBERS_CRITS_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Critical Hit Effects", TargetingConfig.damageNumbersCrits);
+                currentY += spacing;
+                
+                addToggleButton(DAMAGE_NUMBERS_COLORS_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Colored Damage Numbers", TargetingConfig.damageNumbersColors);
+                currentY += spacing;
+                
+                addToggleButton(DAMAGE_NUMBERS_FADEOUT_TOGGLE, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Fade-Out Animation", TargetingConfig.damageNumbersFadeOut);
+                currentY += spacing + 10;
+                
+                // Color configuration buttons (simplified for now)
+                addColorButton(DAMAGE_NUMBERS_COLOR_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Default Color", TargetingConfig.damageNumbersColor);
+                currentY += spacing;
+                
+                addColorButton(CRITICAL_DAMAGE_COLOR_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Critical Color", TargetingConfig.criticalDamageColor);
+                currentY += spacing;
+                
+                addColorButton(LETHAL_DAMAGE_COLOR_BUTTON, centerX - buttonWidth/2, currentY, buttonWidth, buttonHeight,
+                        "Lethal Color", TargetingConfig.lethalDamageColor);
                 break;
         }
     }
@@ -263,6 +364,40 @@ public class GuiTargetingConfig extends GuiScreen {
         String displayText = name + ": " + currentMode.toUpperCase();
         GuiButton button = new GuiButton(id, x, y, width, height, displayText);
         this.buttonList.add(button);
+    }
+    
+    private void addSoundThemeButton(int id, int x, int y, int width, int height, String name, String currentTheme) {
+        String displayText = name + ": " + currentTheme.toUpperCase();
+        GuiButton button = new GuiButton(id, x, y, width, height, displayText);
+        this.buttonList.add(button);
+    }
+    
+    private void addColorButton(int id, int x, int y, int width, int height, String name, int currentColor) {
+        String colorHex = String.format("#%06X", currentColor & 0xFFFFFF);
+        String displayText = name + ": " + colorHex;
+        GuiButton button = new GuiButton(id, x, y, width, height, displayText);
+        this.buttonList.add(button);
+    }
+
+    private void cycleSoundTheme() {
+        switch (TargetingConfig.soundTheme.toLowerCase()) {
+            case "default":
+                TargetingConfig.soundTheme = "zelda";
+                break;
+            case "zelda":
+                TargetingConfig.soundTheme = "modern";
+                break;
+            case "modern":
+                TargetingConfig.soundTheme = "subtle";
+                break;
+            case "subtle":
+                TargetingConfig.soundTheme = "default";
+                break;
+            default:
+                TargetingConfig.soundTheme = "default";
+                break;
+        }
+        TargetingConfig.saveConfig();
     }
 
     @Override
@@ -473,6 +608,86 @@ public class GuiTargetingConfig extends GuiScreen {
                 TargetingConfig.damagePredictionScale = cycleValue(TargetingConfig.damagePredictionScale, 0.5f, 2.0f, scaleIncrement2, decrease);
                 button.displayString = "Damage Text Scale: " + String.format("%.2f", TargetingConfig.damagePredictionScale);
                 break;
+            
+            // Advanced Sound Tweaking controls
+            case SOUND_THEME_BUTTON:
+                cycleSoundTheme();
+                button.displayString = "Sound Theme: " + TargetingConfig.soundTheme.toUpperCase();
+                break;
+            case ENABLE_SOUND_VARIETY_TOGGLE:
+                TargetingConfig.enableSoundVariety = !TargetingConfig.enableSoundVariety;
+                button.displayString = "Sound Variety: " + (TargetingConfig.enableSoundVariety ? "ON" : "OFF");
+                break;
+            
+            // Pitch controls
+            case TARGET_LOCK_PITCH_BUTTON:
+                float lockPitchIncrement = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.targetLockPitch = cycleValue(TargetingConfig.targetLockPitch, 0.5f, 2.0f, lockPitchIncrement, decrease);
+                button.displayString = "Target Lock Pitch: " + String.format("%.2f", TargetingConfig.targetLockPitch);
+                break;
+            case TARGET_SWITCH_PITCH_BUTTON:
+                float switchPitchIncrement = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.targetSwitchPitch = cycleValue(TargetingConfig.targetSwitchPitch, 0.5f, 2.0f, switchPitchIncrement, decrease);
+                button.displayString = "Target Switch Pitch: " + String.format("%.2f", TargetingConfig.targetSwitchPitch);
+                break;
+            case LETHAL_TARGET_PITCH_BUTTON:
+                float lethalPitchIncrement = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.lethalTargetPitch = cycleValue(TargetingConfig.lethalTargetPitch, 0.5f, 2.0f, lethalPitchIncrement, decrease);
+                button.displayString = "Lethal Target Pitch: " + String.format("%.2f", TargetingConfig.lethalTargetPitch);
+                break;
+            case TARGET_LOST_PITCH_BUTTON:
+                float lostPitchIncrement = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.targetLostPitch = cycleValue(TargetingConfig.targetLostPitch, 0.5f, 2.0f, lostPitchIncrement, decrease);
+                button.displayString = "Target Lost Pitch: " + String.format("%.2f", TargetingConfig.targetLostPitch);
+                break;
+            
+            // Damage Numbers Configuration handlers
+            case ENABLE_DAMAGE_NUMBERS_TOGGLE:
+                TargetingConfig.enableDamageNumbers = !TargetingConfig.enableDamageNumbers;
+                button.displayString = "Enable Damage Numbers: " + (TargetingConfig.enableDamageNumbers ? "ON" : "OFF");
+                break;
+            case DAMAGE_NUMBERS_SCALE_BUTTON:
+                float damageScaleIncrement = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.damageNumbersScale = cycleValue(TargetingConfig.damageNumbersScale, 0.5f, 3.0f, damageScaleIncrement, decrease);
+                button.displayString = "Damage Numbers Scale: " + String.format("%.2f", TargetingConfig.damageNumbersScale);
+                break;
+            case DAMAGE_NUMBERS_DURATION_BUTTON:
+                float durationIncrement = isShiftPressed ? 5.0f : 10.0f;
+                TargetingConfig.damageNumbersDuration = (int)cycleValue((float)TargetingConfig.damageNumbersDuration, 20.0f, 200.0f, durationIncrement, decrease);
+                button.displayString = "Duration (ticks): " + TargetingConfig.damageNumbersDuration;
+                break;
+            case DAMAGE_NUMBERS_OFFSET_BUTTON:
+                float offsetIncrement = isShiftPressed ? 0.05f : 0.1f;
+                TargetingConfig.damageNumbersOffset = cycleValue(TargetingConfig.damageNumbersOffset, 0.0f, 2.0f, offsetIncrement, decrease);
+                button.displayString = "Vertical Offset: " + String.format("%.2f", TargetingConfig.damageNumbersOffset);
+                break;
+            case DAMAGE_NUMBERS_CRITS_TOGGLE:
+                TargetingConfig.damageNumbersCrits = !TargetingConfig.damageNumbersCrits;
+                button.displayString = "Critical Hit Effects: " + (TargetingConfig.damageNumbersCrits ? "ON" : "OFF");
+                break;
+            case DAMAGE_NUMBERS_COLORS_TOGGLE:
+                TargetingConfig.damageNumbersColors = !TargetingConfig.damageNumbersColors;
+                button.displayString = "Colored Damage Numbers: " + (TargetingConfig.damageNumbersColors ? "ON" : "OFF");
+                break;
+            case DAMAGE_NUMBERS_FADEOUT_TOGGLE:
+                TargetingConfig.damageNumbersFadeOut = !TargetingConfig.damageNumbersFadeOut;
+                button.displayString = "Fade-Out Animation: " + (TargetingConfig.damageNumbersFadeOut ? "ON" : "OFF");
+                break;
+            case DAMAGE_NUMBERS_COLOR_BUTTON:
+                cycleDamageNumberColor("default");
+                String defaultColorHex = String.format("#%06X", TargetingConfig.damageNumbersColor & 0xFFFFFF);
+                button.displayString = "Default Color: " + defaultColorHex;
+                break;
+            case CRITICAL_DAMAGE_COLOR_BUTTON:
+                cycleDamageNumberColor("critical");
+                String criticalColorHex = String.format("#%06X", TargetingConfig.criticalDamageColor & 0xFFFFFF);
+                button.displayString = "Critical Color: " + criticalColorHex;
+                break;
+            case LETHAL_DAMAGE_COLOR_BUTTON:
+                cycleDamageNumberColor("lethal");
+                String lethalColorHex = String.format("#%06X", TargetingConfig.lethalDamageColor & 0xFFFFFF);
+                button.displayString = "Lethal Color: " + lethalColorHex;
+                break;
         }
         
         // Automatically save config after any change
@@ -513,6 +728,69 @@ public class GuiTargetingConfig extends GuiScreen {
         // Save config after BTP mode change
         TargetingConfig.saveConfig();
     }
+    
+    private void cycleDamageNumberColor(String colorType) {
+        // Define common color options as RGB integers
+        int[] colorOptions = {
+            0xFFFFFF, // White
+            0xFF0000, // Red
+            0x00FF00, // Green
+            0x0000FF, // Blue
+            0xFFFF00, // Yellow
+            0xFF8800, // Orange
+            0xFF00FF, // Magenta
+            0x00FFFF, // Cyan
+            0x808080, // Gray
+            0xFF6666, // Light Red
+            0x66FF66, // Light Green
+            0x6666FF, // Light Blue
+            0xFFFFAA, // Light Yellow
+            0xFFAA66, // Light Orange
+            0xAA66FF, // Purple
+            0x66FFAA  // Light Cyan
+        };
+        
+        int currentColor;
+        switch (colorType) {
+            case "critical":
+                currentColor = TargetingConfig.criticalDamageColor;
+                break;
+            case "lethal":
+                currentColor = TargetingConfig.lethalDamageColor;
+                break;
+            default: // "default"
+                currentColor = TargetingConfig.damageNumbersColor;
+                break;
+        }
+        
+        // Find current color index
+        int currentIndex = 0;
+        for (int i = 0; i < colorOptions.length; i++) {
+            if (colorOptions[i] == currentColor) {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // Cycle to next color
+        int nextIndex = (currentIndex + 1) % colorOptions.length;
+        int nextColor = colorOptions[nextIndex];
+        
+        // Apply the new color
+        switch (colorType) {
+            case "critical":
+                TargetingConfig.criticalDamageColor = nextColor;
+                break;
+            case "lethal":
+                TargetingConfig.lethalDamageColor = nextColor;
+                break;
+            default: // "default"
+                TargetingConfig.damageNumbersColor = nextColor;
+                break;
+        }
+        
+        TargetingConfig.saveConfig();
+    }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -542,7 +820,13 @@ public class GuiTargetingConfig extends GuiScreen {
                 this.drawCenteredString(this.fontRenderer, "§6Camera Settings", centerX, 55, 0xFFAA00);
                 break;
             case 2:
-                this.drawCenteredString(this.fontRenderer, "§6Entity Filtering, Audio & Performance", centerX, 55, 0xFFAA00);
+                this.drawCenteredString(this.fontRenderer, "§6Entity Filtering & Basic Audio", centerX, 55, 0xFFAA00);
+                break;
+            case 3:
+                this.drawCenteredString(this.fontRenderer, "§6Advanced Sound Tweaking", centerX, 55, 0xFFAA00);
+                break;
+            case 4:
+                this.drawCenteredString(this.fontRenderer, "§6Damage Numbers Configuration", centerX, 55, 0xFFAA00);
                 break;
         }
         

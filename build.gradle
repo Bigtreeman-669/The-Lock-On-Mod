@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.1.0'
+version = '1.1.2'
 group = 'com.zeldatargeting.mod' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'zelda-targeting'
 
@@ -37,6 +37,10 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
+            // JVM arguments for 64-bit Java 8 (6GB heap for comfortable development)
+            // Optimized for mod development with plenty of memory headroom
+            jvmArgs '-Xmx6G', '-Xms2G', '-XX:MaxDirectMemorySize=4G', '-XX:+UseG1GC', '-XX:+UnlockExperimentalVMOptions', '-XX:MaxGCPauseMillis=100', '-XX:+DisableExplicitGC', '-XX:TargetSurvivorRatio=90', '-XX:G1NewSizePercent=50', '-XX:G1MaxNewSizePercent=80', '-XX:G1MixedGCLiveThresholdPercent=35', '-XX:+AlwaysPreTouch', '-XX:+ParallelRefProcEnabled', '-Dfml.ignoreInvalidMinecraftCertificates=true', '-Dfml.ignorePatchDiscrepancies=true'
+
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
@@ -45,6 +49,8 @@ minecraft {
         }
 
         server {
+            // JVM arguments for server (4GB heap for 64-bit Java 8)
+            jvmArgs '-Xmx4G', '-Xms1G', '-XX:MaxDirectMemorySize=2G', '-XX:+UseG1GC', '-XX:+UnlockExperimentalVMOptions', '-XX:MaxGCPauseMillis=100', '-XX:+DisableExplicitGC', '-XX:TargetSurvivorRatio=90', '-XX:G1NewSizePercent=50', '-XX:G1MaxNewSizePercent=80', '-XX:G1MixedGCLiveThresholdPercent=35', '-XX:+AlwaysPreTouch', '-XX:+ParallelRefProcEnabled'
 
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'

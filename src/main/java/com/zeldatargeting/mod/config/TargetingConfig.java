@@ -53,6 +53,26 @@ public class TargetingConfig {
     public static float lethalTargetVolume = 0.8f;
     public static float targetLostVolume = 0.5f;
     
+    // Enhanced Sound Customization Settings
+    public static float targetLockPitch = 1.2f;
+    public static float targetSwitchPitch = 1.0f;
+    public static float lethalTargetPitch = 1.5f;
+    public static float targetLostPitch = 0.8f;
+    public static String soundTheme = "default"; // "default", "zelda", "modern", "subtle"
+    public static boolean enableSoundVariety = false; // Cycle through different sounds
+    
+    // Damage Numbers Display Settings
+    public static boolean enableDamageNumbers = true;
+    public static float damageNumbersScale = 1.0f;
+    public static int damageNumbersDuration = 60; // ticks (3 seconds)
+    public static boolean damageNumbersCrits = true;
+    public static boolean damageNumbersColors = true;
+    public static int damageNumbersColor = 0xFFFFFF; // Default white
+    public static int criticalDamageColor = 0xFFFF00; // Yellow for crits
+    public static int lethalDamageColor = 0xFF0000; // Red for lethal hits
+    public static boolean damageNumbersFadeOut = true;
+    public static float damageNumbersOffset = 0.5f; // Y offset above entity
+    
     // Enhanced Visual Feedback Settings
     public static boolean showDamagePrediction = true;
     public static boolean showHitsToKill = true;
@@ -147,6 +167,42 @@ public class TargetingConfig {
             targetLostVolume = config.getFloat("targetLostVolume", "audio", targetLostVolume, 0.0f, 1.0f,
                 "Volume of target lost sound");
             
+            // Enhanced Sound Customization Settings
+            targetLockPitch = config.getFloat("targetLockPitch", "audio", targetLockPitch, 0.5f, 2.0f,
+                "Pitch of target lock sound");
+            targetSwitchPitch = config.getFloat("targetSwitchPitch", "audio", targetSwitchPitch, 0.5f, 2.0f,
+                "Pitch of target switch sound");
+            lethalTargetPitch = config.getFloat("lethalTargetPitch", "audio", lethalTargetPitch, 0.5f, 2.0f,
+                "Pitch of lethal target sound");
+            targetLostPitch = config.getFloat("targetLostPitch", "audio", targetLostPitch, 0.5f, 2.0f,
+                "Pitch of target lost sound");
+            soundTheme = config.getString("soundTheme", "audio", soundTheme,
+                "Sound theme: default, zelda, modern, subtle");
+            enableSoundVariety = config.getBoolean("enableSoundVariety", "audio", enableSoundVariety,
+                "Enable cycling through different sound variants");
+            
+            // Damage Numbers Display Settings
+            enableDamageNumbers = config.getBoolean("enableDamageNumbers", "damage_numbers", enableDamageNumbers,
+                "Show damage numbers when hitting targeted entities");
+            damageNumbersScale = config.getFloat("damageNumbersScale", "damage_numbers", damageNumbersScale, 0.5f, 3.0f,
+                "Scale of damage number text");
+            damageNumbersDuration = config.getInt("damageNumbersDuration", "damage_numbers", damageNumbersDuration, 20, 200,
+                "Duration damage numbers stay visible (ticks)");
+            damageNumbersCrits = config.getBoolean("damageNumbersCrits", "damage_numbers", damageNumbersCrits,
+                "Show special effects for critical hits");
+            damageNumbersColors = config.getBoolean("damageNumbersColors", "damage_numbers", damageNumbersColors,
+                "Use colored damage numbers based on damage type");
+            damageNumbersColor = config.getInt("damageNumbersColor", "damage_numbers", damageNumbersColor,
+                0x000000, 0xFFFFFF, "Default color for damage numbers (hex format)");
+            criticalDamageColor = config.getInt("criticalDamageColor", "damage_numbers", criticalDamageColor,
+                0x000000, 0xFFFFFF, "Color for critical damage numbers (hex format)");
+            lethalDamageColor = config.getInt("lethalDamageColor", "damage_numbers", lethalDamageColor,
+                0x000000, 0xFFFFFF, "Color for lethal damage numbers (hex format)");
+            damageNumbersFadeOut = config.getBoolean("damageNumbersFadeOut", "damage_numbers", damageNumbersFadeOut,
+                "Enable smooth fade-out animation for damage numbers");
+            damageNumbersOffset = config.getFloat("damageNumbersOffset", "damage_numbers", damageNumbersOffset, 0.0f, 2.0f,
+                "Vertical offset for damage numbers above entities");
+            
             // Enhanced Visual Feedback Settings
             showDamagePrediction = config.getBoolean("showDamagePrediction", "visual_feedback", showDamagePrediction,
                 "Show damage prediction when targeting entities");
@@ -212,6 +268,23 @@ public class TargetingConfig {
                 config.get("audio", "targetSwitchVolume", targetSwitchVolume).set(targetSwitchVolume);
                 config.get("audio", "lethalTargetVolume", lethalTargetVolume).set(lethalTargetVolume);
                 config.get("audio", "targetLostVolume", targetLostVolume).set(targetLostVolume);
+                config.get("audio", "targetLockPitch", targetLockPitch).set(targetLockPitch);
+                config.get("audio", "targetSwitchPitch", targetSwitchPitch).set(targetSwitchPitch);
+                config.get("audio", "lethalTargetPitch", lethalTargetPitch).set(lethalTargetPitch);
+                config.get("audio", "targetLostPitch", targetLostPitch).set(targetLostPitch);
+                config.get("audio", "soundTheme", soundTheme).set(soundTheme);
+                config.get("audio", "enableSoundVariety", enableSoundVariety).set(enableSoundVariety);
+                
+                config.get("damage_numbers", "enableDamageNumbers", enableDamageNumbers).set(enableDamageNumbers);
+                config.get("damage_numbers", "damageNumbersScale", damageNumbersScale).set(damageNumbersScale);
+                config.get("damage_numbers", "damageNumbersDuration", damageNumbersDuration).set(damageNumbersDuration);
+                config.get("damage_numbers", "damageNumbersCrits", damageNumbersCrits).set(damageNumbersCrits);
+                config.get("damage_numbers", "damageNumbersColors", damageNumbersColors).set(damageNumbersColors);
+                config.get("damage_numbers", "damageNumbersColor", damageNumbersColor).set(damageNumbersColor);
+                config.get("damage_numbers", "criticalDamageColor", criticalDamageColor).set(criticalDamageColor);
+                config.get("damage_numbers", "lethalDamageColor", lethalDamageColor).set(lethalDamageColor);
+                config.get("damage_numbers", "damageNumbersFadeOut", damageNumbersFadeOut).set(damageNumbersFadeOut);
+                config.get("damage_numbers", "damageNumbersOffset", damageNumbersOffset).set(damageNumbersOffset);
                 
                 config.get("visual_feedback", "showDamagePrediction", showDamagePrediction).set(showDamagePrediction);
                 config.get("visual_feedback", "showHitsToKill", showHitsToKill).set(showHitsToKill);
@@ -269,6 +342,26 @@ public class TargetingConfig {
         targetSwitchVolume = 0.4f;
         lethalTargetVolume = 0.8f;
         targetLostVolume = 0.5f;
+        
+        // Enhanced Sound Customization defaults
+        targetLockPitch = 1.2f;
+        targetSwitchPitch = 1.0f;
+        lethalTargetPitch = 1.5f;
+        targetLostPitch = 0.8f;
+        soundTheme = "default";
+        enableSoundVariety = false;
+        
+        // Damage Numbers defaults
+        enableDamageNumbers = true;
+        damageNumbersScale = 1.0f;
+        damageNumbersDuration = 60;
+        damageNumbersCrits = true;
+        damageNumbersColors = true;
+        damageNumbersColor = 0xFFFFFF;
+        criticalDamageColor = 0xFFFF00;
+        lethalDamageColor = 0xFF0000;
+        damageNumbersFadeOut = true;
+        damageNumbersOffset = 0.5f;
         
         showDamagePrediction = true;
         showHitsToKill = true;

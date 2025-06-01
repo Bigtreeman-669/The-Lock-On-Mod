@@ -16,11 +16,60 @@ public class TargetingSounds {
     
     private static final Minecraft mc = Minecraft.getMinecraft();
     
-    // Carefully selected Minecraft sounds that fit targeting theme
-    private static final SoundEvent TARGET_LOCK_SOUND = SoundEvents.UI_BUTTON_CLICK;
-    private static final SoundEvent TARGET_SWITCH_SOUND = SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON;
-    private static final SoundEvent LETHAL_TARGET_SOUND = SoundEvents.BLOCK_ANVIL_LAND;
-    private static final SoundEvent TARGET_LOST_SOUND = SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF;
+    // Sound variety counter for cycling through different sounds
+    private static int soundVarietyCounter = 0;
+    
+    // Default theme sounds
+    private static final SoundEvent[] DEFAULT_TARGET_LOCK_SOUNDS = {
+        SoundEvents.UI_BUTTON_CLICK,
+        SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON,
+        SoundEvents.BLOCK_LEVER_CLICK
+    };
+    
+    private static final SoundEvent[] DEFAULT_TARGET_SWITCH_SOUNDS = {
+        SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON,
+        SoundEvents.UI_BUTTON_CLICK,
+        SoundEvents.BLOCK_TRIPWIRE_CLICK_ON
+    };
+    
+    private static final SoundEvent[] DEFAULT_LETHAL_TARGET_SOUNDS = {
+        SoundEvents.BLOCK_ANVIL_LAND,
+        SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+        SoundEvents.BLOCK_NOTE_PLING
+    };
+    
+    private static final SoundEvent[] DEFAULT_TARGET_LOST_SOUNDS = {
+        SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF,
+        SoundEvents.BLOCK_LEVER_CLICK,
+        SoundEvents.BLOCK_TRIPWIRE_CLICK_OFF
+    };
+    
+    // Zelda-inspired theme sounds
+    private static final SoundEvent[] ZELDA_TARGET_LOCK_SOUNDS = {
+        SoundEvents.BLOCK_NOTE_PLING,
+        SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+        SoundEvents.BLOCK_NOTE_BELL
+    };
+    
+    private static final SoundEvent[] ZELDA_TARGET_SWITCH_SOUNDS = {
+        SoundEvents.BLOCK_NOTE_HARP,
+        SoundEvents.BLOCK_NOTE_CHIME,
+        SoundEvents.ENTITY_ITEM_PICKUP
+    };
+    
+    // Modern theme sounds
+    private static final SoundEvent[] MODERN_TARGET_LOCK_SOUNDS = {
+        SoundEvents.BLOCK_PISTON_EXTEND,
+        SoundEvents.BLOCK_DISPENSER_LAUNCH,
+        SoundEvents.ENTITY_BLAZE_HURT
+    };
+    
+    // Subtle theme sounds
+    private static final SoundEvent[] SUBTLE_TARGET_LOCK_SOUNDS = {
+        SoundEvents.BLOCK_SAND_STEP,
+        SoundEvents.BLOCK_CLOTH_STEP,
+        SoundEvents.ENTITY_ITEM_PICKUP
+    };
     
     /**
      * Play sound when locking onto a new target
@@ -39,12 +88,13 @@ public class TargetingSounds {
             }
         }
         
-        // Play normal target lock sound
+        // Get sound based on theme and variety settings
+        SoundEvent sound = getTargetLockSound();
         float volume = TargetingConfig.soundVolume * TargetingConfig.targetLockVolume;
-        float pitch = 1.2f; // Slightly higher pitch for crisp targeting feel
+        float pitch = TargetingConfig.targetLockPitch;
         
-        mc.world.playSound(mc.player, mc.player.getPosition(), 
-            TARGET_LOCK_SOUND, SoundCategory.PLAYERS, volume, pitch);
+        mc.world.playSound(mc.player, mc.player.getPosition(),
+            sound, SoundCategory.PLAYERS, volume, pitch);
     }
     
     /**
@@ -55,11 +105,12 @@ public class TargetingSounds {
             return;
         }
         
+        SoundEvent sound = getTargetSwitchSound();
         float volume = TargetingConfig.soundVolume * TargetingConfig.targetSwitchVolume;
-        float pitch = 1.0f; // Normal pitch for subtle switching
+        float pitch = TargetingConfig.targetSwitchPitch;
         
-        mc.world.playSound(mc.player, mc.player.getPosition(), 
-            TARGET_SWITCH_SOUND, SoundCategory.PLAYERS, volume, pitch);
+        mc.world.playSound(mc.player, mc.player.getPosition(),
+            sound, SoundCategory.PLAYERS, volume, pitch);
     }
     
     /**
@@ -70,11 +121,12 @@ public class TargetingSounds {
             return;
         }
         
+        SoundEvent sound = getLethalTargetSound();
         float volume = TargetingConfig.soundVolume * TargetingConfig.lethalTargetVolume;
-        float pitch = 1.5f; // Higher pitch for dramatic effect
+        float pitch = TargetingConfig.lethalTargetPitch;
         
-        mc.world.playSound(mc.player, mc.player.getPosition(), 
-            LETHAL_TARGET_SOUND, SoundCategory.PLAYERS, volume, pitch);
+        mc.world.playSound(mc.player, mc.player.getPosition(),
+            sound, SoundCategory.PLAYERS, volume, pitch);
     }
     
     /**
@@ -85,11 +137,12 @@ public class TargetingSounds {
             return;
         }
         
+        SoundEvent sound = getTargetLostSound();
         float volume = TargetingConfig.soundVolume * TargetingConfig.targetLostVolume;
-        float pitch = 0.8f; // Lower pitch for "lost" feeling
+        float pitch = TargetingConfig.targetLostPitch;
         
-        mc.world.playSound(mc.player, mc.player.getPosition(), 
-            TARGET_LOST_SOUND, SoundCategory.PLAYERS, volume, pitch);
+        mc.world.playSound(mc.player, mc.player.getPosition(),
+            sound, SoundCategory.PLAYERS, volume, pitch);
     }
     
     /**
@@ -126,6 +179,104 @@ public class TargetingSounds {
             playTargetLockSound(target);
         } else {
             playTargetSwitchSound();
+        }
+    }
+    
+    /**
+     * Get target lock sound based on theme and variety settings
+     */
+    private static SoundEvent getTargetLockSound() {
+        SoundEvent[] sounds = getTargetLockSoundsForTheme();
+        return selectSoundFromArray(sounds);
+    }
+    
+    /**
+     * Get target switch sound based on theme and variety settings
+     */
+    private static SoundEvent getTargetSwitchSound() {
+        SoundEvent[] sounds = getTargetSwitchSoundsForTheme();
+        return selectSoundFromArray(sounds);
+    }
+    
+    /**
+     * Get lethal target sound based on theme and variety settings
+     */
+    private static SoundEvent getLethalTargetSound() {
+        SoundEvent[] sounds = getLethalTargetSoundsForTheme();
+        return selectSoundFromArray(sounds);
+    }
+    
+    /**
+     * Get target lost sound based on theme and variety settings
+     */
+    private static SoundEvent getTargetLostSound() {
+        SoundEvent[] sounds = getTargetLostSoundsForTheme();
+        return selectSoundFromArray(sounds);
+    }
+    
+    /**
+     * Get sound array for current theme
+     */
+    private static SoundEvent[] getTargetLockSoundsForTheme() {
+        switch (TargetingConfig.soundTheme.toLowerCase()) {
+            case "zelda":
+                return ZELDA_TARGET_LOCK_SOUNDS;
+            case "modern":
+                return MODERN_TARGET_LOCK_SOUNDS;
+            case "subtle":
+                return SUBTLE_TARGET_LOCK_SOUNDS;
+            default:
+                return DEFAULT_TARGET_LOCK_SOUNDS;
+        }
+    }
+    
+    private static SoundEvent[] getTargetSwitchSoundsForTheme() {
+        switch (TargetingConfig.soundTheme.toLowerCase()) {
+            case "zelda":
+                return ZELDA_TARGET_SWITCH_SOUNDS;
+            case "modern":
+                return DEFAULT_TARGET_SWITCH_SOUNDS; // Use default for modern theme
+            case "subtle":
+                return DEFAULT_TARGET_SWITCH_SOUNDS; // Use default for subtle theme
+            default:
+                return DEFAULT_TARGET_SWITCH_SOUNDS;
+        }
+    }
+    
+    private static SoundEvent[] getLethalTargetSoundsForTheme() {
+        switch (TargetingConfig.soundTheme.toLowerCase()) {
+            case "zelda":
+                return ZELDA_TARGET_LOCK_SOUNDS; // Use lock sounds for zelda theme
+            case "modern":
+                return DEFAULT_LETHAL_TARGET_SOUNDS;
+            case "subtle":
+                return DEFAULT_LETHAL_TARGET_SOUNDS;
+            default:
+                return DEFAULT_LETHAL_TARGET_SOUNDS;
+        }
+    }
+    
+    private static SoundEvent[] getTargetLostSoundsForTheme() {
+        // All themes use default target lost sounds for consistency
+        return DEFAULT_TARGET_LOST_SOUNDS;
+    }
+    
+    /**
+     * Select sound from array based on variety settings
+     */
+    private static SoundEvent selectSoundFromArray(SoundEvent[] sounds) {
+        if (sounds.length == 0) {
+            return SoundEvents.UI_BUTTON_CLICK; // Fallback sound
+        }
+        
+        if (TargetingConfig.enableSoundVariety && sounds.length > 1) {
+            // Cycle through sounds
+            int index = soundVarietyCounter % sounds.length;
+            soundVarietyCounter++;
+            return sounds[index];
+        } else {
+            // Always use first sound in array
+            return sounds[0];
         }
     }
 }
